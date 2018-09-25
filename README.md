@@ -1,2 +1,4 @@
-# CS265
-CS265 - Unix System Programming 
+# CS265 - Unix System Programming 
+- Assignments
+- Projects
+- Shell Scripts
