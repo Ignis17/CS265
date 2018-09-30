@@ -1,0 +1,8 @@
+# Author: Joel Turbi
+# Course: 265
+# Assignment: Homework#1
+# Created: 09/16/2018
+
+
+# Add this command to either .bashrc or .profile files to update UNIX PATH enviroment variable:
+- export PATH="$PATH:$HOME:$PWD"

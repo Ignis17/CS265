@@ -1,4 +1,0 @@
-# Add this command to either .bashrc or .profile files:
-
-
-export PATH="$PATH:$HOME:$PWD"
