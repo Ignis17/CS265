@@ -1,0 +1,8 @@
+# Author: Joel Turbi
+# Course: CS265
+# Created: 10/1/2018
+
+# Change the prompt for shell
+export PS1=$HOSTNAME@$PWD@$USER:~$
+# Output
+cslab-3.acldomain.local@/cslab/home/TURBIJ@TURBIJ:~$
