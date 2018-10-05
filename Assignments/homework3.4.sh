@@ -2,7 +2,7 @@
 
 # Author: Joel Turbi
 # Course: CS265
-# Assignment: Homework#3
+# Assignment: Homework#3.4
 # Created: 10/1/2018
 
 echo "**********************************************"

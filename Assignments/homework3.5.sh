@@ -2,14 +2,18 @@
 
 # Author: Joel Turbi
 # Course: CS265
-# Assignment: Homework#3.3
+# Assignment: Homework#3.5
 # Created: 10/1/2018
 
+total=0
+
 echo "**********************************************"
-echo "**               Homework#3.3               **"
+echo "**               Homework#3.5               **"
 echo "**********************************************"
 echo
-read -p "Find the average of 4 numbers: " num1 num2 num3 num4 
+
+echo "Enter name of file: "
+read filename
+count=$(grep -c ^ < "$filename")
+echo "$filename has $count lines in total."
 echo "**********************************************"
-echo "The average of numbers entered are: " 
-echo "$((($num1+$num2+$num3+$num4)/4))"
