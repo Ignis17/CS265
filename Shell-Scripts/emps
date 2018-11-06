@@ -1,0 +1,8 @@
+Tom Jones   4424    5/12/66   543354
+Mary Adans  5346    11/4/63   28765
+Sally Chang 1654    7/22/54   650000
+Billy Black 1683    9/23/44   336500
+
+#  awk '{print NR, $0}' emps
+#  awk '{print NR, $1, $2, $5}' emps
+#  awk -F: '/Jones/{print $1,$2}' emps
