@@ -4,51 +4,64 @@
 # Number guessing Game:
 #                       This script asks the user to guess a random number
 #                       between 1 and 100.It works in the folowing wayTuser is  prompted to guess a number between 1 and 100.
-#                    The value entered is then compared to the number that was randomly generated.
+#                       The value entered is then compared to the number that was randomly generated.
 
-Welcome()
-{
-  echo "          ***************************************************"
-  echo "          *       Welcome Number Guessing Game              *"
-  echo "          ***************************************************"
-  echo
-  read -p "<> What is your name: " name
-  echo
+Welcome(){
+	clear
+	echo "          ***************************************************"
+	echo "          *       Welcome to The Number Guessing Game       *"
+	echo "          *                 By: Joel Turbi                  *"
+	echo "          ***************************************************"
+	echo
 }
-Game(){
-  # Calls Welcome function.
+Exit(){
+	echo
+	echo "      **********************************"
+	echo "      *    Thanks for playing $Name!   *"
+	echo "      *    Goodbye!                    *"
+	echo "      **********************************"
+	exit 0
+}
+NewUser(){
+	# Calls Welcome function.
+  Welcome
+  read -p "<>    What is your name: " Name
+  echo
+  # Randomizes number from 1-100
+  Num=$((1+$RANDOM%100))
+  read -p "<>    $Name, I'm thinking of a number between 1-100! Try to guess the number I'm thinking of: " Guess
+}
+User(){
+	# Calls Welcome function.
   Welcome
   # Randomizes number from 1-100
   Num=$((1+$RANDOM%100))
-  Answer=""
-  read -p "$name, I'm thinking of a number between 1-100! Try to guess the number I'm thinking of: " Guess
-  while [[ "$Answer" != "no" ]]; do
+  read -p "<>    $Name, I'm thinking of a number between 1-100! Try to guess the number I'm thinking of: " Guess
+}
+
+Game(){
+	# Declaration of empty string.
+	Answer=""
+	NewUser
+  while [[ "$Answer" != "no" || "$Answer" != "No" || "$Answer" != "NO" ]]; do
     if [ "$Guess" -lt "$Num" ]; then
-      read -p "Too low! Guess Again: " Guess
+      read -p "<>    Too low! Guess Again: " Guess
     elif [ "$Guess" -gt "$Num" ]; then
-        read -p "Too High! Guess Again: " Guess
-    else
-      echo "Invalid input! Try again."
+        read -p "<>    Too High! Guess Again: " Guess
     fi
     if [ "$Num" -eq "$Guess" ]; then
-      read -p "That's it! Would you like to play again? (yes/no) " Answer
+      read -p "<>    That's it! Would you like to play again? (yes/no) " Answer
       if [[ "$Answer" == "yes" || "$Answer" == "Yes" || "$Answer" == "YES" ]]; then
-        clear
-        Welcome
-        Num=$((1+$RANDOM%100))
-        read -p "$name, I'm thinking of a number! Try to guess the number I'm thinking of: " Guess
+        read -p "<>    Is this a new player? (yes/no) " Answer2
+				if [[ "$Answer2" == "yes" || "$Answer2" == "Yes" || "$Answer2" == "YES" ]]; then
+					NewUser
+				else
+					User
+				fi
       elif [[ "$Answer" == "no" || "$Answer" == "No" || "$Answer" == "NO" ]]; then
-        echo
-        echo "Terminating in ..."
-        for i in {10..1};do
-          echo $i;
-          sleep 0.4
-        done
-        echo "Thanks for playing!"
-        echo "GoodBye!"
-        exit 0
+        Exit
       else
-        echo "Invalid input! Try again."
+        echo "<>    Invalid input! Try again."
       fi
     fi
 done
