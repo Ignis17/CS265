@@ -32,12 +32,12 @@ Game(){
     fi
     if [ "$Num" -eq "$Guess" ]; then
       read -p "That's it! Would you like to play again? (yes/no) " Answer
-      if [ "$Answer" == "yes" ]; then
+      if [[ "$Answer" == "yes" || "$Answer" == "Yes" || "$Answer" == "YES" ]]; then
         clear
         Welcome
         Num=$((1+$RANDOM%100))
         read -p "$name, I'm thinking of a number! Try to guess the number I'm thinking of: " Guess
-      elif [ "$Answer" == "no" ]; then
+      elif [[ "$Answer" == "no" || "$Answer" == "No" || "$Answer" == "NO" ]]; then
         echo
         echo "Terminating in ..."
         for i in {10..1};do
