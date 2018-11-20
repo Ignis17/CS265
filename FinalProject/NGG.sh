@@ -9,158 +9,182 @@
 #                       then value entered is then compared to the number that was randomly generated.
 
 # Set bash to quit script and exit on errors:
-# 																						The -e option means "if any pipeline ever ends with a non-zero ('error') exit status,
-# 																						terminate the script immediately". Since grep returns an exit status of 1 when it doesn't
-# 																						find any match, it can cause -e to terminate the script even when there wasn't a real "error".
+# 											The -e option means "if any pipeline ever ends with a non-zero ('error') exit status,
+# 											terminate the script immediately". Since grep returns an exit status of 1 when it doesn't
+# 											find any match, it can cause -e to terminate the script even when there wasn't a real "error".
+#set -e
 
-set -e
 # Declare score and temporary files as well as empty variables.
-Name=""
-Score="/tmp/score.txt"
-TempFile="/tmp/tempscore.txt"
+Name="";
+Score="/tmp/score.txt";
+TempFile="/tmp/tempscore.txt";
 if [ ! -f $Score ]; then
-	touch $Score
+	touch $Score;
 fi
 
 ### Beginning of Functions ###
 # Color coded heading: Sets up borders to green, while underlining and setting the color red to title and credits.
 Welcome(){
 	# Clears the terminal screen everytime Welcome() is called.
-	clear
-	echo
-	echo -e "          \e[1;92m***************************************************\e[0m"
-	echo -e "          \e[1;92m*\e[0m       \e[1;4;91mWelcome to The Number Guessing Game\e[0m       \e[1;92m*\e[0m"
-	echo -e "          \e[1;92m*\e[0m                 \e[1;91mBy: Joel Turbi                  \e[1;92m*\e[0m"
-	echo -e "          \e[1;92m***************************************************\e[0;94m"
-	echo
+	clear;
+	echo;
+	echo -e "          \e[1;92m***************************************************\e[0m";
+	echo -e "          \e[1;92m*\e[0m       \e[1;4;91mWelcome to The Number Guessing Game\e[0m       \e[1;92m*\e[0m";
+	echo -e "          \e[1;92m*\e[0m                 \e[1;91mBy: Joel Turbi                  \e[1;92m*\e[0m";
+	echo -e "          \e[1;92m***************************************************\e[0;94m";
+	echo;
 }
 
+# Generates Statistics of player's total number of guesses as well as any previous top scores.
 GenerateStats(){
-	cat "$Score" | sort -k1n | head -10 > "$TempFile" && mv "$TempFile" "$Score"
-	HighTen=$(cat "$Score")
-	HighNum=$(head -1 "$Score" | awk -F',' '{ print $1 }')
-	HighName=$(head -1 "$Score" | awk -F',' '{ print $2 }')
-	HighTotal=$(tail -1 "$Score" | awk -F',' '{ print $1 }')
-	echo -e "The Top 10 Players are:\n" && \
+	# sort -k1n: Uses the first field as a numeric value and sorts it numerically.
+	# head -10: Displays the first 10 lines from the head/beginning of file (It disregards the any lines after line # 10). It then stores the output to $TempFile.
+	# mv $TempFile $Score: cuts/moves output of $TempFile into $Score.
+	cat "$Score" | sort -k1n | head -10 > "$TempFile" && mv "$TempFile" "$Score";
+	# Stores values of $Score into variable named HighTen (Keeps score of the top 10 players).
+	HighTen=$(cat "$Score");
+	# Score board formatting.
+	# Rank
+	HighNum=$(head -1 "$Score" | awk -F',' '{ print $1 }');
+	# Name of player
+	HighName=$(head -1 "$Score" | awk -F',' '{ print $2 }');
+	# Score - Total number of guesses player took.
+	HighTotal=$(tail -1 "$Score" | awk -F',' '{ print $1 }');
+	echo -e "\e[1;92mThe Top 10 Players are:\n" && \
 	awk -F',' 'BEGIN { printf "%-10s %-10s %-10s\n", "Rank","Name","Score"
 											printf "%-10s %-10s %-10s\n", "----","----","-----" }
-			 { printf "%-10s %-10s %-10s\n", " "NR".",$2," "$1 }' "$Score"
-	echo
+			 { printf "%-10s %-10s %-10s\n", " "NR".",$2," "$1 }' "$Score";
+	echo -e "\e[0;94m";
 }
 
-# Get Player's guess and validate input
+# Gets player's guess and validates input.
 Guess(){
 	Validate(){
-		while ! [[ $Guess -lt 101 || $Guess -gt 0 ]]; do
-			read -p "<>    $Name, that was not a valid guess.\n Try that again: " Guess
-		done
+		while ! [[ $Guess -lt 101 || $Guess -gt 0 || $Guess =~ ^[0-9]+$ ]]; do
+			read -p "<>    $Name, that was not a valid guess.\n Try that again: " Guess;
+		done;
 	}
 	if [ $g -eq 1 ]; then
-		read -p "<>    $Name, Enter your first guess: " Guess
-		Validate
-		let FirstGuess="$Guess"
+		read -p "<>    Hi $Name, I am thinking of a number from 1-100. Try to guess the number I am thinking of: " Guess;
+		Validate;
+		let FirstGuess=$Guess;
 	else
-		read -p "Enter a new guess: " Guess
-		Validate
-		let NewGuess="$Guess"
+		read -p "<>    Enter a new guess: " Guess;
+		Validate;
+		let NewGuess=$Guess;
 	fi
 }
 
 # Generate random number.
 RandomNumber(){
-	let Random=$RANDOM%100;
+	# Randomizes numerical value from 1 to 100.
+	let Random=(1+$RANDOM%100);
 }
 
 # Calculate the difference between the players guesses as absolute value.
 GuessDiff(){
-	OldDiff=$(($Random - $OldGuess))   # Calculates difference between old guess and random number.
-	NewDiff=$(($Random - $NewGuess))   # Calculates difference between new guess and random number.
+	OldDiff=$(($Random - $OldGuess));   # Calculates difference between old guess and random number.
+	NewDiff=$(($Random - $NewGuess));   # Calculates difference between new guess and random number.
 
 	if [[ $OldDiff -lt 0 ]]; then
-		 let "ABSVAL_OLDGDIFF=( 0 - $OldDiff )"
+		 let AOD=( 0 - $OldDiff );
 	else
-		 let ABSVAL_OLDGDIFF="$OldDiff"
+		 let AOD=$OldDiff;
 	fi
 	if [[ $NewDiff -lt 0 ]]; then
-		 let "ABSVAL_NEWGDIFF=( 0 - $NewDiff )"
+		 let AND=( 0 - $NewDiff );
 	else
-		 let ABSVAL_NEWGDIFF="$NewDiff"
+		 let AND=$NewDiff;
 	fi
 }
 
 # Calculate high score
 Calculate(){
 	if [[ $g -lt $HighNum ]]; then
-		echo -e "Congratulations $Name. You have the new high score!"
-		echo -e "The previous holder of this record was $HighName\n"
+		echo -e "<>    Congratulations $Name. You have the new high score!";
+		echo -e "<>    The previous holder of this record was $HighName\n";
 	elif [[ $g -eq $HighNum ]]; then
-		echo -e "Congratulations $Name... You are tied with $HighName for 1st place!\n"
+		echo -e "<>    Congratulations $Name. You are tied with $HighName for 1st place!\n";
 	elif [[ $g -lt $HighTotal ]]; then
-		echo -e "Congratulations $Name... You made it into the Top 10 list!\n"
+		echo -e "<>    Congratulations $Name. You made it into the Top 10 list!\n";
 	else
-		echo -e "I'm sorry $Name, you did not make the Top 10 list this time. Please try again!\n"
+		echo -e "<>    I'm sorry $Name, you did not make the Top 10 list this time. Please try again!\n";
 	fi
-	echo "$g,$Name" >> $Score
-	GenerateStats
+	echo "$g,$Name" >> $Score;
+	GenerateStats;
 }
 
 #Repeat game function
 Repeat(){
-	read -n 1 -p "Play Again? (Y/N): " Answer
+	read -p "<>    Would you like to play again? (yes/no) : " Answer;
 	case $Answer in
-    Y|y)
-      echo ""
-      RandomNumber && Game
-      ;;
-    N|n|*)
+    Yes|yes|YES)
+      echo;
+      RandomNumber && Game;;
+    No|no|NO|*)
+			echo;
       Exit;;
   esac
-}
-
-Game(){
-	#To see the number for debugging, uncomment the following line
-	echo "the random number is $Random"
-	Welcome
-	GenerateStats
-	if [[ ! "$Name" ]]; then
-		read -p "Enter your name: " Name
-	fi
-	echo
-	let g=1 && Guess
-
-	if [[ $FirstGuess -eq $Random ]]; then
-		 echo -e "\n"$Name", You must be very special... You guessed it on the first try!\n"
-		 Calculate && Repeat
-	else
-		 let OldGuess=$FirstGuess
-		 echo "Sorry, please try again..."
-		 let g=2 && Guess
-
-		 for ((g=2; NewGuess != "$Random"; ++g)); do
-			 GuessDiff	# call func gdiff to calculate difference between guesses
-	if [[ "$ABSVAL_OLDGDIFF" -lt "$ABSVAL_NEWGDIFF" ]]; then
-		let OldGuess=$NewGuess
-		echo "<>     You're getting colder..."
-		Guess
-	 else
-		 let OldGuess=$NewGuess
-		 echo "<>    You're getting warmer..."
-		 Guess
-	 fi
- done
- echo -e "\n"$Name"... You guessed it in "$g" tries!\n"
- Calculate && Repeat
-fi
 }
 
 # Color coded closing function: Sets up borders of farewell message in green, while keeping
 Exit(){
 	echo
-	echo -e "\e[1;92m**********************************************\e[0m"
-	echo -e "\e[94m<>\e[0m	\e[1;91mThanks for playing $Name!\e[0m"
-	echo -e "\e[94m<>\e[0m	\e[1;91mGoodbye!\e[0m"
-	echo -e "\e[1;92m**********************************************\e[0m"
-	echo
+	echo -e "\e[1;92m**********************************************\e[0m";
+	echo -e "\e[94m<>\e[0m	\e[1;91mThanks for playing $Name!\e[0m";
+	echo -e "\e[94m<>\e[0m	\e[1;91mGoodbye!\e[0m";
+	echo -e "\e[1;92m**********************************************\e[0m";
+	echo;
+}
+
+# Function to erase high scores: Erases high score upon call.
+Reset(){
+	rm -f /tmp/score.txt;
+	echo -e "<>    High score board has been restored.";
+}
+
+# Calls every other function and takes full control of the game.
+Game(){
+	#To see the number for debugging, uncomment the following line
+	#echo "the random number is $Random"
+	# Calls Welcome function and Generates score board.
+	Welcome;
+	GenerateStats;
+	if [[ ! "$Name" ]]; then
+		read -p "<>     Enter your name: " Name;
+	fi
+	echo;
+	let g=1 && Guess;
+
+	if [[ $FirstGuess -eq $Random ]]; then
+		 echo -e "\n<>    $Name, You must be very special. You guessed it on your very first try!\n"
+		 Calculate && Repeat;
+	else
+		 let OldGuess=$FirstGuess;
+		 echo -e "<>    \e[93mThat was not it! Try again!\e[0;94m";
+		 let g=2 && Guess;
+
+		 for ((g=2; NewGuess != $Random; ++g)); do
+			 GuessDiff;	# call function GuessDiff to calculate difference between guesses.
+			 if [[ $AOD -lt $AND ]]; then
+				 let OldGuess=$NewGuess;
+				 echo -e "<>    \e[37mYou're getting colder.\e[0;94m";
+				 Guess;
+			 else
+				 let OldGuess=$NewGuess;
+				 echo -e "<>    \e[93mYou're getting warmer.\e[0;94m";
+				 Guess;
+			 fi
+		 done;
+		 echo -e "\n<>    Hey $Name! You guessed it in $g tries!\n";
+		 Calculate && Repeat;
+	 fi
 }
 ### Ending of Functions ###
-RandomNumber && Game
+
+# Pass option as a command to reset score board.
+if [[ "$1" == "-r" ]]; then
+	Reset;
+fi
+# Functions call:
+RandomNumber && Game;
