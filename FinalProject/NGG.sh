@@ -41,14 +41,14 @@ GenerateStats(){
 	# head -10: Displays the first 10 lines from the head/beginning of file (It disregards the any lines after line # 10). It then stores the output to $TempFile.
 	# mv $TempFile $Score: cuts/moves output of $TempFile into $Score.
 	cat "$Score" | sort -k1n | head -10 > "$TempFile" && mv "$TempFile" "$Score";
-	# Stores values of $Score into variable named HighTen (Keeps score of the top 10 players).
+	# Stores the output $Score into variable named HighTen (Keeps score of the top 10 players).
 	HighTen=$(cat "$Score");
 	# Score board formatting.
 	# Rank
 	HighNum=$(head -1 "$Score" | awk -F',' '{ print $1 }');
-	# Name of player
+	# Name of players
 	HighName=$(head -1 "$Score" | awk -F',' '{ print $2 }');
-	# Score - Total number of guesses player took.
+	# Score - Overall number of guesses players took.
 	HighTotal=$(tail -1 "$Score" | awk -F',' '{ print $1 }');
 	echo -e "\e[1;92mThe Top 10 Players are:\n" && \
 	awk -F',' 'BEGIN { printf "%-10s %-10s %-10s\n", "Rank","Name","Score"
@@ -60,11 +60,12 @@ GenerateStats(){
 # Gets player's guess and validates input.
 Guess(){
 	Validate(){
-		while ! [[ $Guess -lt 101 || $Guess -gt 0 || $Guess =~ ^[0-9]+$ ]]; do
-			read -p "<>    $Name, that was not a valid guess.\n Try that again: " Guess;
+		while ! [[ $Guess -lt 101 && $Guess -gt 0 && $Guess =~ ^[0-9]+$ ]]; do
+			echo -e "<>    $Name, that was not a valid guess."
+			read -p "<>    Try that again: " Guess
 		done;
 	}
-	if [ $g -eq 1 ]; then
+	if [ $tries -eq 1 ]; then
 		read -p "<>    Hi $Name, I am thinking of a number from 1-100. Try to guess the number I am thinking of: " Guess;
 		Validate;
 		let FirstGuess=$Guess;
@@ -100,17 +101,17 @@ GuessDiff(){
 
 # Calculate high score
 Calculate(){
-	if [[ $g -lt $HighNum ]]; then
+	if [[ $tries -lt $HighNum ]]; then
 		echo -e "<>    Congratulations $Name. You have the new high score!";
 		echo -e "<>    The previous holder of this record was $HighName\n";
-	elif [[ $g -eq $HighNum ]]; then
+	elif [[ $tries -eq $HighNum ]]; then
 		echo -e "<>    Congratulations $Name. You are tied with $HighName for 1st place!\n";
-	elif [[ $g -lt $HighTotal ]]; then
+	elif [[ $tries -lt $HighTotal ]]; then
 		echo -e "<>    Congratulations $Name. You made it into the Top 10 list!\n";
 	else
 		echo -e "<>    I'm sorry $Name, you did not make the Top 10 list this time. Please try again!\n";
 	fi
-	echo "$g,$Name" >> $Score;
+	echo "$tries,$Name" >> $Score;
 	GenerateStats;
 }
 
@@ -146,7 +147,7 @@ Reset(){
 # Calls every other function and takes full control of the game.
 Game(){
 	#To see the number for debugging, uncomment the following line
-	#echo "the random number is $Random"
+	echo "the random number is $Random"
 	# Calls Welcome function and Generates score board.
 	Welcome;
 	GenerateStats;
@@ -154,7 +155,7 @@ Game(){
 		read -p "<>     Enter your name: " Name;
 	fi
 	echo;
-	let g=1 && Guess;
+	let tries=1 && Guess;
 
 	if [[ $FirstGuess -eq $Random ]]; then
 		 echo -e "\n<>    $Name, You must be very special. You guessed it on your very first try!\n"
@@ -162,21 +163,21 @@ Game(){
 	else
 		 let OldGuess=$FirstGuess;
 		 echo -e "<>    \e[93mThat was not it! Try again!\e[0;94m";
-		 let g=2 && Guess;
+		 let tries=2 && Guess;
 
-		 for ((g=2; NewGuess != $Random; ++g)); do
+		 for ((tries=2; NewGuess != $Random; ++tries)); do
 			 GuessDiff;	# call function GuessDiff to calculate difference between guesses.
-			 if [[ $AOD -lt $AND ]]; then
-				 let OldGuess=$NewGuess;
-				 echo -e "<>    \e[37mYou're getting colder.\e[0;94m";
+			 if [[ $Guess -lt $Random ]]; then
+				 echo -e "<>    \e[37mThe number you guessed is too low.\e[0;94m"
+				 echo -e "<>    \e[37mTry going up. :)\e[0;94m";
 				 Guess;
 			 else
-				 let OldGuess=$NewGuess;
-				 echo -e "<>    \e[93mYou're getting warmer.\e[0;94m";
+				 echo -e "<>    \e[93mThe number you guessed is to high!\e[0;94m"
+				 echo -e "<>    \e[93mTry going down. :)\e[0;94m";
 				 Guess;
 			 fi
 		 done;
-		 echo -e "\n<>    Hey $Name! You guessed it in $g tries!\n";
+		 echo -e "\n<>    Hey $Name! You guessed it in $tries tries!\n";
 		 Calculate && Repeat;
 	 fi
 }
