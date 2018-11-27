@@ -118,14 +118,17 @@ Calculate(){
 #Repeat game function
 Repeat(){
 	read -p "<>    Would you like to play again? (yes/no) : " Answer;
-	case $Answer in
-    Yes|yes|YES|y|Y)
-      echo;
-      RandomNumber && Game;;
-    No|no|NO|n|N|*)
+	while ! [[ "$Answer" == "No" || "$Answer" == "no" || "$Answer" == "NO" || "$Answer" == "N" || "$Answer" == "n" ]]; do
+		case $Answer in
+			Yes|yes|YES|y|Y)
 			echo;
-      Exit;;
-  esac
+			RandomNumber && Game;;
+			*)
+			read -p "<>    Would you like to play again? (yes/no) : " Answer;;
+		esac
+	done
+	echo
+	Exit
 }
 
 # Color coded closing function: Sets up borders of farewell message in green, while keeping
@@ -146,10 +149,11 @@ Reset(){
 
 # Calls every other function and takes full control of the game.
 Game(){
-	#To see the number for debugging, uncomment the following line
+	# To see the number for debugging, uncomment the following line
 	echo "the random number is $Random"
 	# Calls Welcome function and Generates score board.
 	Welcome;
+	# Calls GenerateStats function to Generate Statistics.
 	GenerateStats;
 	if [[ ! "$Name" ]]; then
 		read -p "<>     Enter your name: " Name;
@@ -183,9 +187,13 @@ Game(){
 }
 ### Ending of Functions ###
 
+# Functions call:
+
 # Pass option as a command to reset score board.
 if [[ "$1" == "-r" ]]; then
 	Reset;
 fi
-# Functions call:
-RandomNumber && Game;
+
+if [[ $0 ]]; then
+	RandomNumber && Game;
+fi
