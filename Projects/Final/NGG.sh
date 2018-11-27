@@ -119,10 +119,10 @@ Calculate(){
 Repeat(){
 	read -p "<>    Would you like to play again? (yes/no) : " Answer;
 	case $Answer in
-    Yes|yes|YES)
+    Yes|yes|YES|y|Y)
       echo;
       RandomNumber && Game;;
-    No|no|NO|*)
+    No|no|NO|n|N|*)
 			echo;
       Exit;;
   esac
